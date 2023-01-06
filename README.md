@@ -1,16 +1,12 @@
 # w2img
 
-A new Flutter project.
+How to convert a widget to png and display
 
-## Getting Started
+## Inspiration
 
-This project is a starting point for a Flutter application.
+[https://api.flutter.dev/flutter/rendering/RenderRepaintBoundary/toImage.html](https://api.flutter.dev/flutter/rendering/RenderRepaintBoundary/toImage.html)
 
-A few resources to get you started if this is your first Flutter project:
+## TODO
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+figure out how to do this on one page
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.

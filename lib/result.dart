@@ -15,10 +15,15 @@ class Result extends StatelessWidget {
         centerTitle: true,
       ),
       body: Center(
-        child: Image.memory(
-          img,
-          color: Colors.purple,
-          colorBlendMode: BlendMode.darken,
+        child: SizedBox(
+          width: 1000,
+          height: 1000,
+          child: Image.memory(
+            img,
+            scale: 0.2,
+            color: Colors.purple,
+            colorBlendMode: BlendMode.darken,
+          ),
         ),
       ),
     );
