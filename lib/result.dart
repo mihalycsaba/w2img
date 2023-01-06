@@ -16,7 +16,9 @@ class Result extends StatelessWidget {
       ),
       body: Center(
         child: Image.memory(
-          img
+          img,
+          color: Colors.purple,
+          colorBlendMode: BlendMode.darken,
         ),
       ),
     );

@@ -50,18 +50,22 @@ class _MyHomePageState extends State<MyHomePage> {
     return RepaintBoundary(
       key: globalKey,
       child: Center(
-          child: TextButton(
-        onPressed: () async {
-          Uint8List img = await _capturePng();
-          if (!mounted) return;
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => Result(img
-              ),
-            ),
-          );
-        },
-        child: const Text('Hello World', textDirection: TextDirection.ltr),
+          child: Column(
+        children: [
+          const Text('Example'),
+          TextButton(
+            onPressed: () async {
+              Uint8List img = await _capturePng();
+              if (!mounted) return;
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => Result(img),
+                ),
+              );
+            },
+            child: const Text('Hello World', textDirection: TextDirection.ltr),
+          ),
+        ],
       )),
     );
   }
