@@ -1,6 +1,6 @@
 # w2img
 
-How to convert a widget to png and display
+How to convert a widget to png and display the result
 
 ## Inspiration
 
