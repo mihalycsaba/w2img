@@ -1,8 +1,10 @@
 import 'dart:typed_data';
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+
 import 'package:w2img/result.dart';
-import 'dart:ui' as ui;
 
 void main() {
   runApp(const MyApp());
@@ -15,9 +17,6 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
       home: const MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
@@ -47,25 +46,27 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-        child: Column(
-      children: [
-        RepaintBoundary(
-          key: globalKey,
-          child: const Text('Example')),
-        TextButton(
-          onPressed: () async {
-            Uint8List img = await _capturePng();
-            if (!mounted) return;
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => Result(img),
-              ),
-            );
-          },
-          child: const Text('Cheese', textDirection: TextDirection.ltr),
-        ),
-      ],
-    ));
+    return Scaffold(
+      appBar: AppBar(),
+      body: Center(
+          child: Column(
+        children: [
+          RepaintBoundary(key: globalKey, child: const Text('Example')),
+          TextButton(
+            onPressed: () async {
+              Uint8List img = await _capturePng();
+              if (context.mounted) {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => Result(img),
+                  ),
+                );
+              }
+            },
+            child: const Text('Cheese', textDirection: TextDirection.ltr),
+          ),
+        ],
+      )),
+    );
   }
 }

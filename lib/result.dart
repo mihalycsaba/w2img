@@ -3,7 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 
 class Result extends StatelessWidget {
-  const Result(this.img, {Key? key}) : super(key: key);
+  const Result(this.img, {super.key});
 
   final Uint8List img;
 

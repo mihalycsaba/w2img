@@ -6,7 +6,6 @@ How to convert a widget to png and display the result
 
 [https://api.flutter.dev/flutter/rendering/RenderRepaintBoundary/toImage.html](https://api.flutter.dev/flutter/rendering/RenderRepaintBoundary/toImage.html)
 
-## TODO
+## Dev
 
-figure out how to do this on one page
-
+Run it with `flutter run --no-enable-impeller` because of [https://github.com/flutter/flutter/issues/128885](https://github.com/flutter/flutter/issues/128885)
