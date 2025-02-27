@@ -51,7 +51,12 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Center(
           child: Column(
         children: [
-          RepaintBoundary(key: globalKey, child: const Text('Example')),
+          RepaintBoundary(
+              key: globalKey,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: const Text('Example'),
+              )),
           TextButton(
             onPressed: () async {
               Uint8List img = await _capturePng();
