@@ -26,11 +26,7 @@ jobs:
       - name: Check if Version Exists
         id: check_version
         run: |
-          if git show-ref --tags --verify --quiet "refs/tags/v${{ steps.extract_version.outputs.VERSION }}"; then
-            echo "VERSION_EXISTS=true" >> $GITHUB_OUTPUT
-          else
-            echo "VERSION_EXISTS=false" >> $GITHUB_OUTPUT
-          fi
+          echo "VERSION_EXISTS=true" >> $GITHUB_OUTPUT
 
         #Setup Java
       - name: Set Up Java
