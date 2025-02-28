@@ -27,9 +27,9 @@ jobs:
         id: check_version
         run: |
           if git rev-parse "v${{ steps.extract_version.outputs.VERSION }}" >/dev/null 2>&1; then
-            echo "VERSION_EXISTS=true" >> $GITHUB_ENV
+            echo "VERSION_EXISTS=true" >> $GITHUB_OUTPUT
           else
-            echo "VERSION_EXISTS=false" >> $GITHUB_ENV
+            echo "VERSION_EXISTS=false" >> $GITHUB_OUTPUT
           fi
 
         #Setup Java
