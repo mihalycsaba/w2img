@@ -25,8 +25,10 @@ jobs:
         #Check if Tag Exists
       - name: Check if Version Exists
         id: check_version
+        env: 
+          VERSION: ${{ steps.extract_version.outputs.VERSION }}
         run: |
-          if git rev-parse "v${{ steps.extract_version.outputs.VERSION }}" >/dev/null 2>&1; then
+          if git rev-parse "v$VERSION" >/dev/null 2>&1; then
             echo "VERSION_EXISTS=true" >> $GITHUB_ENV
           else
             echo "VERSION_EXISTS=false" >> $GITHUB_ENV
