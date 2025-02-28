@@ -53,13 +53,15 @@ jobs:
 
         #Setup Flutter
       - name: Set Up Flutter
+        if: steps.check_version.outputs.VERSION_EXISTS == 'false'
         uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
 
         #Install Dependencies
       - name: Install Dependencies
-        run: flutter --version
+        if: steps.check_version.outputs.VERSION_EXISTS == 'false'
+        run: flutter pub get
 
         #Setup Keystore
       - name: Decode Keystore
