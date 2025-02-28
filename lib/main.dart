@@ -55,8 +55,8 @@ class _MyHomePageState extends State<MyHomePage> {
               key: globalKey,
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child:
-                    const Text('Example Text', style: TextStyle(color: Colors.green)),
+                child: const Text('Example Text',
+                    style: TextStyle(color: Colors.deepOrange)),
               )),
           TextButton(
             onPressed: () async {
