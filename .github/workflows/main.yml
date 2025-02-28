@@ -14,6 +14,8 @@ jobs:
         #Checkout Repository
       - name: Checkout Repository
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
         #Extract Version
       - name: Extract version from pubspec.yaml
@@ -26,7 +28,11 @@ jobs:
       - name: Check if Version Exists
         id: check_version
         run: |
-          echo "VERSION_EXISTS=true" >> $GITHUB_OUTPUT
+          if git show-ref --tags --verify --quiet "refs/tags/v${{ steps.extract_version.outputs.VERSION }}"; then
+            echo "VERSION_EXISTS=true" >> $GITHUB_OUTPUT
+          else
+            echo "VERSION_EXISTS=false" >> $GITHUB_OUTPUT
+          fi
 
         #Setup Java
       - name: Set Up Java
