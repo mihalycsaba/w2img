@@ -60,8 +60,7 @@ jobs:
 
         #Install Dependencies
       - name: Install Dependencies
-        if: steps.check_version.outputs.VERSION_EXISTS == 'false'
-        run: flutter pub get
+        run: flutter --version
 
         #Setup Keystore
       - name: Decode Keystore
