@@ -34,6 +34,8 @@ jobs:
 
         #Setup Java
       - name: Set Up Java
+        env: 
+          EXISTS : ${{ steps.check_version.outputs.VERSION_EXISTS }}
         if: steps.check_version.outputs.VERSION_EXISTS == 'false'
         uses: actions/setup-java@v4
         with:
