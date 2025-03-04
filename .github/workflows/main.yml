@@ -110,3 +110,5 @@ jobs:
       - name: "✏️ Generate release changelog"
         if: steps.check_version.outputs.VERSION_EXISTS == 'false'
         uses: janheinrichmerker/action-github-changelog-generator@v2
+        with:
+          token: ${{ secrets.TOKEN }} 
