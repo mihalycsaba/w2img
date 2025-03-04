@@ -105,3 +105,8 @@ jobs:
           tag: v${{ steps.extract_version.outputs.VERSION }}
           token: ${{ secrets.TOKEN }}
           generateReleaseNotes: true
+
+        #Create changelog
+      - name: "✏️ Generate release changelog"
+        if: steps.check_version.outputs.VERSION_EXISTS == 'false'
+        uses: janheinrichmerker/action-github-changelog-generator@v2
