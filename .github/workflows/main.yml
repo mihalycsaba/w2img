@@ -103,5 +103,4 @@ jobs:
         with:
           artifacts: build/app/outputs/flutter-apk/${{ steps.extract_name.outputs.NAME }}-${{ steps.extract_version.outputs.VERSION }}.apk
           tag: v${{ steps.extract_version.outputs.VERSION }}
-          token: ${{ secrets.TOKEN }}
           generateReleaseNotes: true
