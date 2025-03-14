@@ -31,8 +31,7 @@ jobs:
           version=$(grep '^version: ' pubspec.yaml | cut -d ' ' -f 2 | tr -d '\r')
           echo "VERSION=$version" >> $GITHUB_OUTPUT
           if [["$version" == *-pre*]]; then
-            echo "PRERELEASE=true" >> $GITHUB_OUTPUT        if: steps.check_version.outputs.VERSION_EXISTS == 'false' && steps.check_version.outputs.PRERELEASE == 'true'
-
+            echo "PRERELEASE=true" >> $GITHUB_OUTPUT
           else
             echo "PRERELEASE=false" >> $GITHUB_OUTPUT
           fi
