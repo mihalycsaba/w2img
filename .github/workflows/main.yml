@@ -102,10 +102,18 @@ jobs:
           path: |
             build/app/outputs/flutter-apk/${{ steps.extract_name.outputs.NAME }}-${{ steps.extract_version.outputs.VERSION }}.apk
         
+        #Create Release
+      - name: Create Release
+        if: steps.check_version.outputs.VERSION_EXISTS == 'false' && steps.extract_version.outputs.PRERELEASE == 'false'
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: build/app/outputs/flutter-apk/${{ steps.extract_name.outputs.NAME }}-${{ steps.extract_version.outputs.VERSION }}.apk
+          tag: v${{ steps.extract_version.outputs.VERSION }}
+          generateReleaseNotes: true
       
         #Create Pre-Release
       - name: Create Pre-Release
-        if: steps.extract_version.outputs.PRERELEASE == 'true'
+        if: steps.check_version.outputs.VERSION_EXISTS == 'false' && steps.extract_version.outputs.PRERELEASE == 'true'
         uses: ncipollo/release-action@v1
         with:
           artifacts: build/app/outputs/flutter-apk/${{ steps.extract_name.outputs.NAME }}-${{ steps.extract_version.outputs.VERSION }}.apk
