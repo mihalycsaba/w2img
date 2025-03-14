@@ -105,7 +105,7 @@ jobs:
       
         #Create Pre-Release
       - name: Create Pre-Release
-        if: steps.check_version.outputs.PRERELEASE == 'true'
+        if: steps.extract_version.outputs.PRERELEASE == 'true'
         uses: ncipollo/release-action@v1
         with:
           artifacts: build/app/outputs/flutter-apk/${{ steps.extract_name.outputs.NAME }}-${{ steps.extract_version.outputs.VERSION }}.apk
