@@ -218,7 +218,7 @@ jobs:
           path: build\windows\x64\runner\${{ needs.check.outputs.NAME }}-${{ needs.check.outputs.VERSION }}-windows.zip
       
   create-release:
-    needs: [check, linux-build, android-build, windows-build]
+    needs: [check, linux-build, android-build, web-build, windows-build]
     if: needs.check.outputs.VERSION_EXISTS == 'false'
     name: Create Release
     runs-on: ubuntu-latest
