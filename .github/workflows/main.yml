@@ -6,7 +6,6 @@ on:
       - master
 
 jobs:
-  #Check if version exists
   check:
     name: Check Version
     runs-on: ubuntu-latest
@@ -17,20 +16,18 @@ jobs:
       VERSION_EXISTS: ${{ steps.check_version.outputs.VERSION_EXISTS }}
 
     steps:
-        #Checkout Repository
       - name: Checkout Repository
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
-        #Extract Name
       - name: Extract name from pubspec.yaml
         id: extract_name
         run: |
           name=$(grep '^name: ' pubspec.yaml | cut -d ' ' -f 2 | tr -d '\r')
           echo "NAME=$name" >> $GITHUB_OUTPUT
-
-        #Extract Version
+        
+        # This step extracts the version from pubspec.yaml and checks if it is a pre-release version, by checking if it contains the word "pre".  
       - name: Extract version from pubspec.yaml
         id: extract_version
         run: |
@@ -42,7 +39,6 @@ jobs:
             echo "PRERELEASE=false" >> $GITHUB_OUTPUT
           fi
 
-        #Check if Tag Exists
       - name: Check if Version Exists
         id: check_version
         run: |
@@ -52,7 +48,6 @@ jobs:
             echo "VERSION_EXISTS=false" >> $GITHUB_OUTPUT
           fi    
 
-  # Build for Android and Linux  
   linux-build:
     needs: [check]      
     if: needs.check.outputs.VERSION_EXISTS == 'false'
@@ -60,50 +55,41 @@ jobs:
     runs-on: ubuntu-latest 
 
     steps:
-        #Checkout Repository
       - name: Checkout Repository
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
-        #Install Linux dependencies
       - name: Install Linux Dependencies
         run: |
           sudo apt-get update -y
           sudo apt-get install -y ninja-build libgtk-3-dev
 
-        #Setup Flutter
       - name: Set Up Flutter
         uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
 
-        #Install Dependencies
       - name: Install Dependencies
         run: flutter pub get
 
-        #Build Linux
       - name: Build Linux
         run: flutter build linux --release
 
-        #Rename Linux build folder
       - name: Rename Linux build folder
         run: mv build/linux/x64/release/bundle/ build/linux/x64/release/${{ needs.check.outputs.NAME }}
 
-        #Zip Linux build
       - name: Zip Linux build
         run: |
           cd build/linux/x64/release 
           zip -r ${{ needs.check.outputs.NAME }}-${{ needs.check.outputs.VERSION }}-linux.zip ${{ needs.check.outputs.NAME }}
 
-        #Upload Artifacts
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: linux-artifacts
           path: build/linux/x64/release/${{ needs.check.outputs.NAME }}-${{ needs.check.outputs.VERSION }}-linux.zip
   
-  # Build for Android and Linux  
   android-build:
     needs: [check]      
     if: needs.check.outputs.VERSION_EXISTS == 'false'
@@ -111,35 +97,29 @@ jobs:
     runs-on: ubuntu-latest 
 
     steps:
-        #Checkout Repository
       - name: Checkout Repository
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
-        #Install Linux dependencies
       - name: Install Linux Dependencies
         run: |
           sudo apt-get update -y
         
-        #Setup Java
       - name: Set Up Java
         uses: actions/setup-java@v4
         with:
           distribution: 'jetbrains'
           java-version: '17'
         
-        #Setup Flutter
       - name: Set Up Flutter
         uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
 
-        #Install Dependencies
       - name: Install Dependencies
         run: flutter pub get
 
-        #Setup Keystore
       - name: Decode Keystore
         run: |
           echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/app/keystore.jks
@@ -151,22 +131,55 @@ jobs:
           echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> android/key.properties
           echo "storeFile=keystore.jks" >> android/key.properties
         
-       #Building APK
       - name: Build APK
         run: flutter build apk --release
 
-        #Rename APK
       - name: Rename APK
         run: mv build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/${{ needs.check.outputs.NAME }}-${{ needs.check.outputs.VERSION }}.apk
 
-        #Upload Artifacts
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: android-artifacts
           path: build/app/outputs/flutter-apk/${{ needs.check.outputs.NAME }}-${{ needs.check.outputs.VERSION }}.apk
 
-  #Build for Windows
+  web-build:
+    needs: [check]      
+    if: needs.check.outputs.VERSION_EXISTS == 'false'
+    name: Build for Web
+    runs-on: ubuntu-latest 
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set Up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+
+      - name: Install Dependencies
+        run: flutter pub get
+
+      - name: Build Web
+        run: flutter build web --release
+
+      - name: Rename Web build folder
+        run: mv build/web/ build/${{ needs.check.outputs.NAME }}
+
+      - name: Zip Web build
+        run: |
+          cd build/
+          zip -r ${{ needs.check.outputs.NAME }}-${{ needs.check.outputs.VERSION }}-web.zip ${{ needs.check.outputs.NAME }}
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-artifacts
+          path: build/${{ needs.check.outputs.NAME }}-${{ needs.check.outputs.VERSION }}-web.zip
+
   windows-build:
     needs: [check]
     if: needs.check.outputs.VERSION_EXISTS == 'false'
@@ -174,44 +187,36 @@ jobs:
     runs-on: windows-latest
 
     steps:
-        #Checkout Repository
       - name: Checkout Repository
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
-        #Setup Flutter
       - name: Set Up Flutter
         uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
 
-        #Install Dependencies
       - name: Install Dependencies
         run: flutter pub get
 
-       #Building Windows
       - name: Build Windows
         run: flutter build windows --release
 
-        #Rename Windows build folder
       - name: Rename Windows build folder
         run: ren .\build\windows\x64\runner\Release “${{ needs.check.outputs.NAME }}“
 
-        #Zip Windows build
       - name: Zip Windows build
         run: |
           cd .\build\windows\x64\runner\
           Compress-Archive -Path .\${{ needs.check.outputs.NAME }}\ -DestinationPath .\${{ needs.check.outputs.NAME }}-${{ needs.check.outputs.VERSION }}-windows.zip
       
-        #Upload Artifacts
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: windows-artifacts
           path: build\windows\x64\runner\${{ needs.check.outputs.NAME }}-${{ needs.check.outputs.VERSION }}-windows.zip
       
-  #Create release
   create-release:
     needs: [check, linux-build, android-build, windows-build]
     if: needs.check.outputs.VERSION_EXISTS == 'false'
@@ -219,39 +224,39 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-        #Download Artifacts
       - name: Download Linux Artifacts
         uses: actions/download-artifact@v4
         with:
           name: linux-artifacts
       
-        #Download Android Artifacts
       - name: Download Android Artifacts
         uses: actions/download-artifact@v4
         with:
           name: android-artifacts
+      
+      - name: Download Web Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: web-artifacts
         
-        #Download Linux Artifacts
       - name: Download Windows Artifacts
         uses: actions/download-artifact@v4
         with:
           name: windows-artifacts
         
-        #Create Release
       - name: Create Release
         if: needs.check.outputs.PRERELEASE == 'false'
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "${{ needs.check.outputs.NAME }}-${{ needs.check.outputs.VERSION }}.apk,${{ needs.check.outputs.NAME }}-${{ needs.check.outputs.VERSION }}-linux.zip,${{ needs.check.outputs.NAME }}-${{ needs.check.outputs.VERSION }}-windows.zip"
+          artifacts: "${{ needs.check.outputs.NAME }}-${{ needs.check.outputs.VERSION }}.apk,${{ needs.check.outputs.NAME }}-${{ needs.check.outputs.VERSION }}-linux.zip,${{ needs.check.outputs.NAME }}-${{ needs.check.outputs.VERSION }}-web.zip,${{ needs.check.outputs.NAME }}-${{ needs.check.outputs.VERSION }}-windows.zip"
           tag: v${{ needs.check.outputs.VERSION }}
           generateReleaseNotes: true
       
-        #Create Pre-Release
       - name: Create Pre-Release
         if: needs.check.outputs.PRERELEASE == 'true'
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "${{ needs.check.outputs.NAME }}-${{ needs.check.outputs.VERSION }}.apk,${{ needs.check.outputs.NAME }}-${{ needs.check.outputs.VERSION }}-linux.zip,${{ needs.check.outputs.NAME }}-${{ needs.check.outputs.VERSION }}-windows.zip"
+          artifacts: "${{ needs.check.outputs.NAME }}-${{ needs.check.outputs.VERSION }}.apk,${{ needs.check.outputs.NAME }}-${{ needs.check.outputs.VERSION }}-linux.zip,${{ needs.check.outputs.NAME }}-${{ needs.check.outputs.VERSION }}-web.zip,${{ needs.check.outputs.NAME }}-${{ needs.check.outputs.VERSION }}-windows.zip"
           tag: v${{ needs.check.outputs.VERSION }}
           generateReleaseNotes: true
           prerelease: true
