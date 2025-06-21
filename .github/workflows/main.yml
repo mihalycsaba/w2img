@@ -113,7 +113,9 @@ jobs:
         #Zip Linux build
       - name: Zip Linux build
         if: steps.check_version.outputs.VERSION_EXISTS == 'false'
-        run: zip -r ${{ steps.extract_name.outputs.NAME }}-${{ steps.extract_version.outputs.VERSION }}.zip build/linux/x64/release/${{ steps.extract_name.outputs.NAME }}
+        run: |
+          cd build/linux/x64/release 
+          zip -r ${{ steps.extract_name.outputs.NAME }}-${{ steps.extract_version.outputs.VERSION }}.zip ${{ steps.extract_name.outputs.NAME }}
 
         #Upload Artifacts
       - name: Upload Artifacts
@@ -123,14 +125,14 @@ jobs:
           name: linux-artifacts
           path: |
             build/app/outputs/flutter-apk/${{ steps.extract_name.outputs.NAME }}-${{ steps.extract_version.outputs.VERSION }}.apk
-            ${{ steps.extract_name.outputs.NAME }}-${{ steps.extract_version.outputs.VERSION }}.zip
+            build/linux/x64/release/${{ steps.extract_name.outputs.NAME }}-${{ steps.extract_version.outputs.VERSION }}.zip
       
         #Create Release
       - name: Create Release
         if: steps.check_version.outputs.VERSION_EXISTS == 'false' && steps.extract_version.outputs.PRERELEASE == 'false'
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "build/app/outputs/flutter-apk/${{ steps.extract_name.outputs.NAME }}-${{ steps.extract_version.outputs.VERSION }}.apk,${{ steps.extract_name.outputs.NAME }}-${{ steps.extract_version.outputs.VERSION }}.zip"
+          artifacts: "build/app/outputs/flutter-apk/${{ steps.extract_name.outputs.NAME }}-${{ steps.extract_version.outputs.VERSION }}.apk,build/linux/x64/release/${{ steps.extract_name.outputs.NAME }}-${{ steps.extract_version.outputs.VERSION }}.zip"
           tag: v${{ steps.extract_version.outputs.VERSION }}
           generateReleaseNotes: true
       
@@ -139,7 +141,7 @@ jobs:
         if: steps.check_version.outputs.VERSION_EXISTS == 'false' && steps.extract_version.outputs.PRERELEASE == 'true'
         uses: ncipollo/release-action@v1
         with:
-          artifacts: build/app/outputs/flutter-apk/${{ steps.extract_name.outputs.NAME }}-${{ steps.extract_version.outputs.VERSION }}.apk
+          artifacts: "build/app/outputs/flutter-apk/${{ steps.extract_name.outputs.NAME }}-${{ steps.extract_version.outputs.VERSION }}.apk,build/linux/x64/release/${{ steps.extract_name.outputs.NAME }}-${{ steps.extract_version.outputs.VERSION }}.zip"
           tag: v${{ steps.extract_version.outputs.VERSION }}
           generateReleaseNotes: true
           prerelease: true
