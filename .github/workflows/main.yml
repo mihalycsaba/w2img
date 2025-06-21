@@ -202,7 +202,7 @@ jobs:
         if: needs.check.outputs.PRERELEASE == 'false'
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "app/outputs/flutter-apk/${{ needs.check.outputs.NAME }}-${{ needs.check.outputs.VERSION }}.apk,linux/x64/release/${{ needs.check.outputs.NAME }}-${{ needs.check.outputs.VERSION }}-linux.zip,windows/x64/runner/${{ needs.check.outputs.NAME }}-${{ needs.check.outputs.VERSION }}-windows.zip"
+          artifacts: "app/outputs/flutter-apk/${{ needs.check.outputs.NAME }}-${{ needs.check.outputs.VERSION }}.apk,linux/x64/release/${{ needs.check.outputs.NAME }}-${{ needs.check.outputs.VERSION }}-linux.zip,${{ needs.check.outputs.NAME }}-${{ needs.check.outputs.VERSION }}-windows.zip"
           tag: v${{ needs.check.outputs.VERSION }}
           generateReleaseNotes: true
       
@@ -211,7 +211,7 @@ jobs:
         if: needs.check.outputs.PRERELEASE == 'true'
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "app/outputs/flutter-apk/${{ needs.check.outputs.NAME }}-${{ needs.check.outputs.VERSION }}.apk,linux/x64/release/${{ needs.check.outputs.NAME }}-${{ needs.check.outputs.VERSION }}-linux.zip,windows/x64/runner/${{ needs.check.outputs.NAME }}-${{ needs.check.outputs.VERSION }}-windows.zip"
+          artifacts: "app/outputs/flutter-apk/${{ needs.check.outputs.NAME }}-${{ needs.check.outputs.VERSION }}.apk,linux/x64/release/${{ needs.check.outputs.NAME }}-${{ needs.check.outputs.VERSION }}-linux.zip,${{ needs.check.outputs.NAME }}-${{ needs.check.outputs.VERSION }}-windows.zip"
           tag: v${{ needs.check.outputs.VERSION }}
           generateReleaseNotes: true
           prerelease: true
