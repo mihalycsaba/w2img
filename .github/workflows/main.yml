@@ -55,52 +55,46 @@ jobs:
   # Build and release for Android and Linux  
   linux-build:
     needs: [check]      
+    if: needs.check.outputs.VERSION_EXISTS == 'false'
     name: Build & Release 
     runs-on: ubuntu-latest 
 
     steps:
         #Checkout Repository
       - name: Checkout Repository
-        if: needs.check.outputs.VERSION_EXISTS == 'false'
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
         
         #Setup Java
       - name: Set Up Java
-        if: needs.check.outputs.VERSION_EXISTS == 'false'
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
+          distribution: 'jetbrains'
           java-version: '17'
 
         #Install Linux dependencies
       - name: Install Linux Dependencies
-        if: needs.check.outputs.VERSION_EXISTS == 'false'
         run: |
           sudo apt-get update -y
           sudo apt-get install -y ninja-build libgtk-3-dev
 
         #Setup Flutter
       - name: Set Up Flutter
-        if: needs.check.outputs.VERSION_EXISTS == 'false'
         uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
 
         #Install Dependencies
       - name: Install Dependencies
-        if: needs.check.outputs.VERSION_EXISTS == 'false'
         run: flutter pub get
 
         #Setup Keystore
       - name: Decode Keystore
-        if: needs.check.outputs.VERSION_EXISTS == 'false'
         run: |
           echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/app/keystore.jks
           
       - name: Create key.properties
-        if: needs.check.outputs.VERSION_EXISTS == 'false'
         run: |
           echo "storePassword=${{ secrets.KEYSTORE_PASSWORD }}" > android/key.properties
           echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> android/key.properties
@@ -109,34 +103,28 @@ jobs:
         
        #Building APK
       - name: Build APK
-        if: needs.check.outputs.VERSION_EXISTS == 'false'
         run: flutter build apk --release
 
         #Rename APK
       - name: Rename APK
-        if: needs.check.outputs.VERSION_EXISTS == 'false'
         run: mv build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/${{ needs.check.outputs.NAME }}-${{ needs.check.outputs.VERSION }}.apk
 
         #Build Linux
       - name: Build Linux
-        if: needs.check.outputs.VERSION_EXISTS == 'false'
         run: flutter build linux --release
 
         #Rename Linux build folder
       - name: Rename Linux build folder
-        if: needs.check.outputs.VERSION_EXISTS == 'false'
         run: mv build/linux/x64/release/bundle/ build/linux/x64/release/${{ needs.check.outputs.NAME }}
 
         #Zip Linux build
       - name: Zip Linux build
-        if: needs.check.outputs.VERSION_EXISTS == 'false'
         run: |
           cd build/linux/x64/release 
           zip -r ${{ needs.check.outputs.NAME }}-${{ needs.check.outputs.VERSION }}-linux.zip ${{ needs.check.outputs.NAME }}
 
         #Upload Artifacts
       - name: Upload Artifacts
-        if: needs.check.outputs.VERSION_EXISTS == 'false'
         uses: actions/upload-artifact@v4
         with:
           name: linux-artifacts
@@ -144,9 +132,17 @@ jobs:
             build/app/outputs/flutter-apk/${{ needs.check.outputs.NAME }}-${{ needs.check.outputs.VERSION }}.apk
             build/linux/x64/release/${{ needs.check.outputs.NAME }}-${{ needs.check.outputs.VERSION }}-linux.zip
       
+  # Create release
+  create-release:
+    needs: [check, linux-build]
+    if: needs.check.outputs.VERSION_EXISTS == 'false'
+    name: Create Release
+    runs-on: ubuntu-latest
+
+    steps:
         #Create Release
       - name: Create Release
-        if: needs.check.outputs.VERSION_EXISTS == 'false' && needs.check.outputs.PRERELEASE == 'false'
+        if: needs.check.outputs.PRERELEASE == 'false'
         uses: ncipollo/release-action@v1
         with:
           artifacts: "build/app/outputs/flutter-apk/${{ needs.check.outputs.NAME }}-${{ needs.check.outputs.VERSION }}.apk,build/linux/x64/release/${{ needs.check.outputs.NAME }}-${{ needs.check.outputs.VERSION }}-linux.zip"
@@ -155,7 +151,7 @@ jobs:
       
         #Create Pre-Release
       - name: Create Pre-Release
-        if: needs.check.outputs.VERSION_EXISTS == 'false' && needs.check.outputs.PRERELEASE == 'true'
+        if: needs.check.outputs.PRERELEASE == 'true'
         uses: ncipollo/release-action@v1
         with:
           artifacts: "build/app/outputs/flutter-apk/${{ needs.check.outputs.NAME }}-${{ needs.check.outputs.VERSION }}.apk,build/linux/x64/release/${{ needs.check.outputs.NAME }}-${{ needs.check.outputs.VERSION }}-linux.zip"
