@@ -6,7 +6,7 @@ on:
       - master
 
 jobs:
-  # Check if version exists
+  #Check if version exists
   check:
     name: Check Version
     runs-on: ubuntu-latest
@@ -52,11 +52,11 @@ jobs:
             echo "VERSION_EXISTS=false" >> $GITHUB_OUTPUT
           fi    
 
-  # Build and release for Android and Linux  
+  # Build for Android and Linux  
   linux-build:
     needs: [check]      
     if: needs.check.outputs.VERSION_EXISTS == 'false'
-    name: Build & Release 
+    name: Build for Android and Linux
     runs-on: ubuntu-latest 
 
     steps:
@@ -131,10 +131,55 @@ jobs:
           path: |
             build/app/outputs/flutter-apk/${{ needs.check.outputs.NAME }}-${{ needs.check.outputs.VERSION }}.apk
             build/linux/x64/release/${{ needs.check.outputs.NAME }}-${{ needs.check.outputs.VERSION }}-linux.zip
+
+  #Build for Windows
+  windows-build:
+    needs: [check]
+    if: needs.check.outputs.VERSION_EXISTS == 'false'
+    name: Build for Windows
+    runs-on: windows-latest
+
+    steps:
+        #Checkout Repository
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+        #Setup Flutter
+      - name: Set Up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+
+        #Install Dependencies
+      - name: Install Dependencies
+        run: flutter pub get
+
+       #Building Windows
+      - name: Build Windows
+        run: flutter build windows --release
+
+        #Rename Windows build folder
+      - name: Rename Windows build folder
+        run: ren .\build\windows\x64\runner\Release “${{ needs.check.outputs.NAME }}“
+
+        #Zip Windows build
+      - name: Zip Windows build
+        run: |
+          cd .\build\windows\x64\runner\
+          Compress-Archive -Path .\${{ needs.check.outputs.NAME }}\ -DestinationPath .\${{ needs.check.outputs.NAME }}-${{ needs.check.outputs.VERSION }}-windows.zip
       
-  # Create release
+        #Upload Artifacts
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-artifacts
+          path: build\windows\x64\runner\${{ needs.check.outputs.NAME }}\${{ needs.check.outputs.NAME }}-${{ needs.check.outputs.VERSION }}-windows.zip
+      
+  #Create release
   create-release:
-    needs: [check, linux-build]
+    needs: [check, linux-build, windows-build]
     if: needs.check.outputs.VERSION_EXISTS == 'false'
     name: Create Release
     runs-on: ubuntu-latest
