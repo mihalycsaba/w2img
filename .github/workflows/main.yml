@@ -130,9 +130,7 @@ jobs:
         if: steps.check_version.outputs.VERSION_EXISTS == 'false' && steps.extract_version.outputs.PRERELEASE == 'false'
         uses: ncipollo/release-action@v1
         with:
-          artifacts: |
-            build/app/outputs/flutter-apk/${{ steps.extract_name.outputs.NAME }}-${{ steps.extract_version.outputs.VERSION }}.apk
-            ${{ steps.extract_name.outputs.NAME }}-${{ steps.extract_version.outputs.VERSION }}.zip
+          artifacts: "build/app/outputs/flutter-apk/${{ steps.extract_name.outputs.NAME }}-${{ steps.extract_version.outputs.VERSION }}.apk,${{ steps.extract_name.outputs.NAME }}-${{ steps.extract_version.outputs.VERSION }}.zip"
           tag: v${{ steps.extract_version.outputs.VERSION }}
           generateReleaseNotes: true
       
